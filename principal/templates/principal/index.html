@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .home-container{
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+    }
+</style>
+
+
+
+<div class="home-container">
+    
+
+    <div>
+        <h3>Topicos pesquisados</h3>
+        <hr>
+        <a href="{% url 'home' %}">All</a>
+        {% for topico in topicos %}
+        <div>
+            
+            <a href="{% url 'home' %}?q={{topico.nome}}">{{topico.nome}}</a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    
+    
+    <div>
+        <h5>{{room_count}} salas encontradas!</h5>
+        <a href="{% url 'criar-sala' %}">Criar Sala</a>
+
+    
+            
+
+            {% for room in rooms %}
+                <div>
+                    {% if request.user == room.adm %}
+                        <a href="{% url 'editar-sala' room.id %}">Editar sala</a><span>
+                        <a href="{% url 'deletar-sala' room.id %}">Deletar sala</a>
+                    {% endif %}
+                    <p>@{{room.adm.username}}</p>
+                    <h2>{{ room.id }}-- <a href="{% url 'room' room.id %}"> {{ room.nome }}</a></h2>
+                    <a href="#">{{room.topico}}</a>
+                    <hr>
+                </div>
+            {% endfor %}
+    </div>
+</div>    
+{% endblock %}
+
+
+
