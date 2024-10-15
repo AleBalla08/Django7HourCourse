@@ -1,5 +1,55 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{{room.nome}}</h1>
+<style>
+    .room-container{
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+    }
+</style>
+
+
+
+
+<div class="room-container" >
+    <div>
+        <h1>{{room.nome}}</h1>
+        <hr>
+        <h5>Descrição:</h5>
+        <h4>{{room.descricao}}</h4>
+        <hr>
+        <div class="comentario-wrapper" >
+            <h3>Conversas</h3>
+            <hr>
+            {% for mensagem in mensagens %}
+            <p>@{{mensagem.user}} - enviada em {{mensagem.enviada}}</p>
+            <p>-- {{mensagem.texto}}</p>
+            {% if request.user == mensagem.user %}
+                <a href="{% url 'deletar-mensagem' mensagem.id %}">Deletar mensagem</a>
+            {% endif %}
+            <hr>
+            {% endfor %}
+        </div>
+
+        <div class="mensagem-form" >
+            {% if request.user.is_authenticated %}
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <input type="text" name="texto" placeholder="Digite sua mensagem">
+                </form>
+            {% else %}
+                <h5>Voce precisa estar logado para enviar mensagens</h5>
+            {% endif %}
+            </div>
+    </div>
+    <div>
+        <h3>PARTICIPANTES:</h3>
+        <hr>
+        {% for p in participantes %}
+        <div>
+            <p>@{{p.username}}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

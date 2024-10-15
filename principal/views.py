@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from django.db.models import Q
-from .models import Room, Topico
+from .models import Room, Topico, Mensagem
 from .forms import RoomForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 
 
 # Create your views here.
@@ -17,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 # ]
 
 def loginPag(request):
+    pagina = 'login'
     if request.user.is_authenticated:
         return redirect('home')
 
@@ -31,21 +33,38 @@ def loginPag(request):
         usuario = authenticate(request, username=username, password=senha)
         if usuario is not None:
             login(request, usuario)
+            #messages.success(request, 'login realizado com sucesso, seja bem vindo!')
             return redirect('home')
         else:
             messages.error(request, 'Usuario ou Senha não existem')
         
             
 
-    context = {}
-    return render(request, 'principal/pagina-login.html', context)
+    context = {'pagina':pagina}
+    return render(request, 'principal/login-registro.html', context)
 
 
 def logoutUsuario(request):
     logout(request)
     return redirect('home')
 
+def registrarUsuario(request):
+    registro = UserCreationForm()
+    if request.method == 'POST':
+        registro = UserCreationForm(request.POST)
+        if registro.is_valid:
+            usuario = registro.save(commit=False)
+            usuario.username = usuario.username.lower()
+            usuario.save()
+            login(request, usuario)
+            return redirect('home')
+        else:
+            messages.error(request, 'Algo deu errado, verifique suas credenciais')
 
+
+
+    context = {'registro':registro}
+    return render(request, 'principal/login-registro.html', context)
 
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
@@ -57,18 +76,49 @@ def home(request):
     
     
     topicos = Topico.objects.all()
-
+    mensagens_sala = Mensagem.objects.all().order_by('-enviada')
     room_count = rooms.count()
    
 
-    context = {'rooms': rooms, 'topicos':topicos, 'room_count':room_count}
+    context = {'rooms': rooms, 'topicos':topicos, 'room_count':room_count, 'mensagens':mensagens_sala}
     return render(request, 'principal/index.html', context)
 
 def room(request, pk):
     room = Room.objects.get(id=pk)
+    participantes = room.participantes.all()
     
-    context = {'room':room}
+    # Fetch messages ordered by 'enviada' from the room
+    mensagens_sala = room.mensagem_set.order_by('-enviada')
+
+    if request.method == 'POST':
+        mensagem = Mensagem.objects.create(
+            user=request.user,
+            room=room, 
+            texto=request.POST.get('texto')
+        )
+        room.participantes.add(request.user)
+        return redirect('room', pk=room.id)
+    
+    #print(f'Room ID: {room.id}, Participants: {participantes.count()}')
+    #print(f'Messages Count: {mensagens_sala.count()}')
+    for mensagem in mensagens_sala:
+        print(f'Mensagem: {mensagem.texto}, Enviada: {mensagem.enviada}')
+
+    context = {
+        'room': room,
+        'mensagens': mensagens_sala,
+        'participantes': participantes
+    }
     return render(request, 'principal/room.html', context)
+
+
+def deletarMensagem(request, pk):
+    mensagem = Mensagem.objects.get(id=pk)
+    if request.method == 'POST':
+        mensagem.delete()
+        return redirect('home')
+        
+    return render(request, 'principal/deletar.html', {'obj':mensagem} )
 
 @login_required(login_url='pagina-login')
 def criarRoom(request):

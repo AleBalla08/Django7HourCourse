@@ -4,7 +4,7 @@
 <style>
     .home-container{
         display: grid;
-        grid-template-columns: 1fr 3fr;
+        grid-template-columns: 1fr 3fr 1fr;
     }
 </style>
 
@@ -46,6 +46,19 @@
                     <hr>
                 </div>
             {% endfor %}
+    </div>
+
+
+    <div class="atiividades-container" >
+        <h3>Atividades Recentes</h3>
+        <hr>
+        {% for a in mensagens %}
+            <small>@{{a.user}} -- Enviada em {{a.enviada}}</small>
+            <p>Respondeu à sala {{a.room}}:</p>
+            <p>"{{a.texto}}"</p>
+            <hr>
+
+        {% endfor %}
     </div>
 </div>    
 {% endblock %}
