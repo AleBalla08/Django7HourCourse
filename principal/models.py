@@ -18,26 +18,28 @@ class Room(models.Model):
     nome = models.CharField(max_length=50)
     descricao = models.TextField()
     participantes = models.ManyToManyField(User, related_name='participantes', blank=True )
-    criada = models.DateField(auto_now=True)
-
-    class Meta:
-        ordering = ['-criada',]
+    criada = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.nome
     
+    
+        
+
+   
 
 class Mensagem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     texto = models.TextField()
-    enviada = models.DateField(auto_now=True)
-
-    class Meta:
-        ordering = ['-enviada',]
+    enviada = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.texto[0:20]
+
+    
+
+    
 
 
 

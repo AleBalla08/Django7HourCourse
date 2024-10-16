@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from .models import Room, Topico, Mensagem
-from .forms import RoomForm
+from .forms import RoomForm, TopicoForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -72,11 +72,11 @@ def home(request):
         Q(topico__nome__icontains=q) |
         Q(nome__icontains=q) |
         Q(descricao__icontains=q)                    
-                                 )
+                                 ).order_by('-criada')
     
     
     topicos = Topico.objects.all()
-    mensagens_sala = Mensagem.objects.all().order_by('-enviada')
+    mensagens_sala = Mensagem.objects.filter(room__topico__nome__icontains=q).order_by('-enviada')
     room_count = rooms.count()
    
 
@@ -84,12 +84,12 @@ def home(request):
     return render(request, 'principal/index.html', context)
 
 def room(request, pk):
-    room = Room.objects.get(id=pk)
+    room = Room.objects.order_by('-criada').get(id=pk)
     participantes = room.participantes.all()
     
     # Fetch messages ordered by 'enviada' from the room
-    mensagens_sala = room.mensagem_set.order_by('-enviada')
-
+    mensagens_sala = room.mensagem_set.all().order_by('-enviada')
+    
     if request.method == 'POST':
         mensagem = Mensagem.objects.create(
             user=request.user,
@@ -101,8 +101,8 @@ def room(request, pk):
     
     #print(f'Room ID: {room.id}, Participants: {participantes.count()}')
     #print(f'Messages Count: {mensagens_sala.count()}')
-    for mensagem in mensagens_sala:
-        print(f'Mensagem: {mensagem.texto}, Enviada: {mensagem.enviada}')
+    #for mensagem in mensagens_sala:
+        #print(f'Mensagem: {mensagem.texto}, Enviada: {mensagem.enviada}')
 
     context = {
         'room': room,
@@ -126,7 +126,9 @@ def criarRoom(request):
     if request.method == 'POST':
         form = RoomForm(request.POST)
         if form.is_valid:
-            form.save()
+            room = form.save(commit=False)
+            room.adm = request.user
+            room.save()
             return redirect('home')
     context = {'form':form}
     return render(request, 'principal/criar-sala.html', context)
@@ -152,3 +154,21 @@ def deletarRoom(request, pk):
         room.delete()
         return redirect('home')
     return render(request,'principal/deletar.html', {'obj':room} )    
+
+
+def perfilUser(request, pk):
+    user = User.objects.get(id=pk)
+    rooms = user.room_set.all()
+    topicos = Topico.objects.all()
+    mensagens = user.mensagem_set.all()
+    context = {'user':user, 'rooms':rooms, 'topicos':topicos, 'mensagens':mensagens}
+    return render(request, 'principal/perfil.html', context)
+
+def criarTopico(request):
+    form = TopicoForm(request.POST) 
+    if request.method == 'POST':
+        if form.is_valid:
+            form.save()
+            return redirect('home')
+    context = {'form':form}
+    return render(request, 'principal/novo_topico.html', context )

@@ -1,0 +1,11 @@
+{% block content %}
+<h3>Topicos pesquisados</h3>
+        <hr>
+        <a href="{% url 'home' %}">All</a>
+        {% for topico in topicos %}
+        <div>
+            
+            <a href="{% url 'home' %}?q={{topico.nome}}">{{topico.nome}}</a>
+        </div>
+        {% endfor %}
+{% endblock %}

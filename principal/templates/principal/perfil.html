@@ -1,39 +1,32 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <style>
-    .home-container{
+    .perfil-container{
         display: grid;
         grid-template-columns: 1fr 3fr 1fr;
     }
 </style>
 
 
+<h1>{{user.username}}</h1>
 
-<div class="home-container">
-    
-
+<div class="perfil-container">
     <div>
-        <a href="{% url 'criar-topico' %}">Adicionar novo Tópico</a>
         {% include 'principal/topicos_component.html' %}
     </div>
-    
-    
-    
+
+
     <div>
-        <h5>{{room_count}} salas encontradas!</h5>
-        <a href="{% url 'criar-sala' %}">Criar Sala</a>
+        <h3>Salas Criadas</h3>
         <hr>
         {% include 'principal/feed_component.html' %}
     </div>
-        
-    
-    
-    <div class="atiividades-container" >
+
+
+    <div>
         {% include 'principal/recentes_component.html' %}
     </div>
-</div>    
+</div>
+
+
 {% endblock %}
-
-
-

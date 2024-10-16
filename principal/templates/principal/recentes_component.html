@@ -1,0 +1,16 @@
+{% block content %}
+
+    <h3>Atividades Recentes</h3>
+    <hr>
+    {% for a in mensagens %}
+        <small><a href="{% url 'perfil-user' a.user.id %}">@{{a.user}}</a> -- Enviada em {{a.enviada}}</small>
+        <p>Respondeu à sala {{a.room}}:</p>
+        <p>"{{a}}"</p>
+        {% if request.user == a.user %}
+            <a href="{% url 'deletar-mensagem' a.id %}">Remover mensagem</a>
+        {% endif %}
+        <hr>
+
+    {% endfor %}
+
+{% endblock %}
