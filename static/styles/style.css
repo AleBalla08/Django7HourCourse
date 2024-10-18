@@ -420,6 +420,15 @@ a {
   flex-basis: 25%;
 }
 /*========== Layout Box ==========*/
+.mostr-5{
+  padding: 0 1em;
+}
+.frases-atividades-mobile{
+  display: flex;
+  flex-direction: column;
+}
+
+
 
 .layout__box {
   width: 90%;

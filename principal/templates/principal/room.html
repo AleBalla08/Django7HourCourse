@@ -6,7 +6,7 @@
         <div class="room">
           <div class="room__top">
             <div class="room__topLeft">
-              <a href="index.html">
+              <a href="{% url 'home' %}">
                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
                   <title>arrow-left</title>
                   <path
@@ -14,11 +14,11 @@
                   ></path>
                 </svg>
               </a>
-              <h3>Study Room</h3>
+              <h3>Sala de Estudo</h3>
             </div>
 
             <div class="room__topRight">
-              <a href="#">
+              <a href="{% url 'editar-sala' room.id %}">
                 <svg
                   enable-background="new 0 0 24 24"
                   height="32"
@@ -44,7 +44,7 @@
                   </g>
                 </svg>
               </a>
-              <a href="#">
+              <a href="{% url 'deletar-sala' room.id  %}">
                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
                   <title>remove</title>
                   <path
